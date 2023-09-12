@@ -1,0 +1,325 @@
+~ Setting up React environment ~ 
+-------------------------------- 
+
+If create-react-app was installed globally, it's advised to uninstall, so that way npx always fetches the newest version of create-react-app:
+
+npm uninstall -g create-react-app
+
+Create a React app:
+
+npx create-react-app my-react-app
+
+This is technically outdated, as React docs now recommend using Next.JS or other framework.
+
+--========================================--
+
+~ Managing state with useState ~
+---------------------------------
+
+import React, { useState } from 'react';
+
+const Counter = () => {
+	const [count, setCount] = useState(0);
+
+	const incrementCount = () => {
+		setCount(count + 1);
+	};
+
+	return (
+		<div>
+			<p>You clicked {count} times</p>
+			<button onClick={incrementCount}>Click me</button>
+		</div>
+	);
+};
+
+export default Counter;
+
+--========================================--
+
+~ Using refs ~
+--------------
+
+import React, { useRef } from 'react';
+
+function MyComponent() {
+	const inputRef = useRef(null);
+
+	const handleClick = () => {
+		inputRef.current.focus();
+	};
+
+	return (
+		<div>
+			<input type="text" ref={inputRef} />
+			<button onClick={handleClick}>Focus Input</button>
+		</div>
+	);
+}
+
+export default MyComponent;
+
+--========================================--
+
+~ CSS Modules ~
+---------------
+
+// styles.css
+.container {
+  width: 100%;
+  height: 100%;
+}
+
+.red {
+  color: red;
+}
+
+.blue {
+  color: blue;
+}
+
+// App.js
+import React from 'react';
+import styles from './styles.css';
+
+const App = () => {
+  const [color, setColor] = React.useState('red');
+
+  const handleClick = () => {
+    setColor(color === 'red' ? 'blue' : 'red');
+  };
+
+  return (
+    <div className={styles.container}>
+      <h1 className={`${styles[color]}`}>Hello World!</h1>
+      <button onClick={handleClick}>Change Color</button>
+    </div>
+  );
+};
+
+export default App;
+
+--========================================--
+
+~ Lifting up props ~
+--------------------
+
+import React from 'react';
+
+const ChildComponent = ({ name, handleClick }) => {
+  return (
+    <div>
+      <h1>Hello, {name}!</h1>
+      <button onClick={handleClick}>Click me!</button>
+    </div>
+  );
+};
+
+const ParentComponent = () => {
+  const [name, setName] = React.useState('John');
+
+  const handleClick = () => {
+    setName(name === 'John' ? 'Jane' : 'John');
+  };
+
+  return (
+    <div>
+      <ChildComponent name={name} handleClick={handleClick} />
+    </div>
+  );
+};
+
+export default ParentComponent;
+
+--========================================--
+
+~ useEffect with cleanup ~
+--------------------------
+
+import React, { useState, useEffect } from 'react';
+
+const App = () => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    document.title = `You clicked ${count} times`;
+
+    return () => {
+      document.title = '';
+    };
+  }, [count]);
+
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
+    </div>
+  );
+};
+
+export default App;
+
+--========================================--
+
+~ useReducer ~
+--------------
+
+import { useReducer } from "react";
+
+const initialState = { count: 0 };
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "increment":
+      return { count: state.count + 1 };
+    case "decrement":
+      return { count: state.count - 1 };
+    default:
+      throw new Error();
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  return (
+    <>
+      Count: {state.count}
+      <button onClick={() => dispatch({ type: "decrement" })}>-</button>
+      <button onClick={() => dispatch({ type: "increment" })}>+</button>
+    </>
+  );
+}
+
+--========================================--
+
+~ useContext ~
+--------------
+
+import React, { useContext } from 'react';
+
+const ThemeContext = React.createContext('light');
+
+function App() {
+  return (
+    <ThemeContext.Provider value="dark">
+      <Toolbar />
+    </ThemeContext.Provider>
+  );
+}
+
+function Toolbar(props) {
+  return (
+    <div>
+      <ThemedButton />
+    </div>
+  );
+}
+
+function ThemedButton() {
+  const theme = useContext(ThemeContext);
+  return <button style={{ backgroundColor: theme }}>I am styled by theme context!</button>;
+}
+
+/* --
+In this example, we create a ThemeContext using React.createContext. We then use the useContext hook to consume the value of the context in the ThemedButton component. The ThemedButton component is rendered inside the Toolbar component, which is itself rendered inside the App component. The App component provides a value of "dark" to the ThemeContext.Provider, which is then consumed by the ThemedButton component.
+
+The ThemeContext.Provider component is used to provide a value to the ThemeContext object that we created earlier. In this example, we are providing a value of "dark" to the ThemeContext.Provider component, which means that any components that consume the ThemeContext object will receive a value of "dark".
+
+The initial value of the ThemeContext object is "light", which means that if a component consumes the ThemeContext object before it has been wrapped in a ThemeContext.Provider component, it will receive a value of "light". However, in this example, we are wrapping the ThemedButton component in a ThemeContext.Provider component and providing a value of "dark", which means that the ThemedButton component will receive a value of "dark" instead of the initial value of "light".
+ -- */
+
+--========================================--
+
+~ React.memo() ~
+----------------
+
+import React from 'react';
+
+const MyComponent = React.memo((props) => {
+  // your component logic here
+});
+
+export default MyComponent;
+
+/* --
+In this example, MyComponent is wrapped with React.memo(). This tells React to look at the props passed to MyComponent and compare their new values to their previous values. If the value of a prop has changed, then the component will be re-rendered and re-evaluated. If the parent component changed but the prop values for that component did not change, then component execution will be skipped 2.
+-- */
+
+--========================================--
+
+~ useMemo() ~
+-------------
+
+import React, { useMemo } from 'react';
+
+const MyComponent = (props) => {
+  const memoizedValue = useMemo(() => {
+    // your expensive calculation here
+  }, [props.dependency]);
+
+  return (
+    // your component logic here
+  );
+};
+
+export default MyComponent;
+
+/* --
+In this example, MyComponent is using useMemo() to memoize the result of an expensive calculation. The second argument to useMemo() is an array of dependencies that the memoized value depends on. If any of these dependencies change, then the memoized value will be recomputed.
+
+useMemo and React.memo are both used to optimize the performance of React components, but they serve different purposes.
+
+useMemo is a hook that can be used to memoize the result of a function. It takes two arguments: a function and an array of dependencies. The function is only re-executed if one of the dependencies changes. This can be useful for expensive calculations that don’t need to be re-executed on every render.
+
+React.memo is a higher-order component that can be used to memoize the result of a component. It works by comparing the props passed to the component between renders. If the props haven’t changed, then the component isn’t re-rendered. This can be useful for optimizing components that are expensive to render.
+
+In summary, useMemo is used to memoize the result of a function, while React.memo is used to memoize the result of a component. They both help optimize performance by preventing unnecessary re-execution or re-rendering.
+-- */
+
+--========================================--
+
+~ useCallback() ~
+-----------------
+
+import React, { useCallback } from 'react';
+
+const MyComponent = ({ onClick }) => {
+  const handleClick = useCallback(() => {
+    onClick('Hello, world!');
+  }, [onClick]);
+
+  return (
+    <button onClick={handleClick}>Click me!</button>
+  );
+};
+
+export default MyComponent;
+
+/* --
+In this example, MyComponent is a functional component that takes a prop called onClick. The handleClick function is defined using useCallback. This tells React to look at the dependencies passed to useCallback and compare their new values to their previous values. If the value of a dependency has changed, then the function will be re-executed. If the parent component changed but the dependency values for that component did not change, then function execution will be skipped.
+
+useMemo is used to memoize the result of a function, while useCallback is used to memoize a function definition.
+-- */
+
+--========================================--
+
+~ await/async fetch/post ~
+---------------------
+
+  const submitOrderHandler = async (userData) => {
+    setIsSubmitting(true);
+    await fetch(
+      "https://react-http-3a2c4-default-rtdb.firebaseio.com/orders.json",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          user: userData,
+          orderedItems: cartCtx.items,
+        }),
+      }
+    );
+    setIsSubmitting(false);
+    setDidSubmit(true);
+    cartCtx.clearCart();
+  };
