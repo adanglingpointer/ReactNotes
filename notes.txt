@@ -305,7 +305,7 @@ useMemo is used to memoize the result of a function, while useCallback is used t
 --========================================--
 
 ~ await/async fetch/post ~
----------------------
+--------------------------
 
   const submitOrderHandler = async (userData) => {
     setIsSubmitting(true);
@@ -323,3 +323,22 @@ useMemo is used to memoize the result of a function, while useCallback is used t
     setDidSubmit(true);
     cartCtx.clearCart();
   };
+
+--========================================--
+
+~ custom React hook ~
+---------------------
+
+import { useState, useEffect } from "react";
+
+function useFetch(url) {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => setData(data));
+  }, [url]);
+
+  return data;
+}
